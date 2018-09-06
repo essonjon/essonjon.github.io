@@ -1,0 +1,61 @@
+<html>
+<head></head>
+<body>
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Demonstrate Params Ordering Exception",
+        "description": "Illustrating an exception to https://readme.readme.io/v2.0/discuss/5b8ed8a584303f0003a11710",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+        "url": "https://api.example.com/",
+        "description": "production"
+    }],
+    "paths": {
+        "/api/{documentId}": {
+            "put": {
+                "operationId": "documentReplace",
+                "parameters": [
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "example header",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "bodyParam",
+                        "in": "body",
+                        "description": "example body param",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "documentId",
+                        "in": "path",
+                        "description": "example path param",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The requested document has been updated"
+                    }
+                },
+                "summary": "Replaces the document"
+            }
+        }
+    }
+}
+</body>
+</html>
