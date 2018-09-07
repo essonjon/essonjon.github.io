@@ -1,0 +1,1937 @@
+{
+   "openapi":"3.0.0",
+   "info":{
+      "version":"1.0.0",
+      "title":"hanan testing dmitri Solid Commerce Order Management API",
+      "description":"An Orders API",
+      "contact":{
+         "email":"support@solidcommerce.com"
+      }
+   },
+   "servers":[
+      {
+         "url":"https://orders.solidcommerce.com/api"
+      }
+   ],
+   "paths":{
+      "/orders":{
+         "get":{
+            "tags":[
+               "Sales Orders"
+            ],
+            "description":"Get Orders",
+            "parameters":[
+               {
+                  "name":"Authorization",
+                  "in":"header",
+                  "required":true,
+                  "description":"Authorization Token",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"Limit",
+                  "description":"Limit the number of orders/items in the result. Deafult is 30.",
+                  "in":"query",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"Offset",
+                  "in":"query",
+                  "description":"The number of items to skip before starting to collect the result. Deafult is 0.",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"InlineCount",
+                  "in":"query",
+                  "description":"When set to 1 generates additional query to count the total number of matching items. For better performance when totals are not required set to 0. Default is 1.",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"Columns",
+                  "in":"query",
+                  "description":"Array (comma-separated list) of properties to return; for example 'Id,OrderStatus.DisplayName,OrderDate,OrderTotal,SalesChannel.Name,StoreOrderId,ShipToAddress.Country,ShipToAddress.ContactName'. Defaults are Id, CompanyId, ShipToAddress, IsPrime.",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"OrderBy",
+                  "in":"query",
+                  "description":"Array (comma-separated list) of properties to sort by; each item should contains a property name and order direction (asc/desc); for example 'OrderDate desc,OrderTotal asc'.  Available properties to sort by: 'Id, OrderDate, OrderTotal, OrderSubTotal, MustArriveByDate, StoreOrderId, AlternateOrderId, MyStoreName, OrderStatus.Name, SalesChannel.Name, PaymentMethod.Name, PaymentTransactionId, PaymentProcessorId, ShippingMethod.Name, ShipToAddress.ContactName, ShipToAddress.ContactCompany, ShipToAddress.Street1, ShipToAddress.Street2, ShipToAddress.City, ShipToAddress.State, ShipToAddress.Zip, ShipToAddress.Country, ShipToAddress.PhoneNumber, ShipToAddress.Email, Buyer.ContactName, Buyer.Street1, Buyer.Street2, Buyer.City, Buyer.State, Buyer.Zip, Buyer.Country, Buyer.PhoneNumber, Buyer.Email'. Default is 'OrderDate desc'.",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"Timestamp",
+                  "in":"query",
+                  "description":"When specified will filter orders with creation datetime BEFORE the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"Search",
+                  "in":"query",
+                  "description":"The value to search for",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"SearchCode",
+                  "in":"query",
+                  "description":"Defines where to search with the Search value",
+                  "schema":{
+                     "type":"string",
+                     "enum":[
+                        "Id",
+                        "MarketOrderNumber",
+                        "ProductSku",
+                        "PaymentBuyerContact",
+                        "OrderItemListingId",
+                        "OrderItemListingTitle",
+                        "ProductPartialSku",
+                        "PaymentBuyerAddress",
+                        "ProductStandardId",
+                        "ProductManufacturer",
+                        "ProductManufacturerModelNumber",
+                        "OrderItemStorageName",
+                        "AlternateOrderId",
+                        "OrderItemPurchaseOrderId",
+                        "ProductSerialNumber"
+                     ]
+                  }
+               },
+               {
+                  "name":"OrderStatuses",
+                  "in":"query",
+                  "description":"comma-separated list of Order Status codes; the standard values are the following 'PAID'(pending shipment), 'COMPLETED'(shipped), 'PARTIALLYCOMPLETED', 'WAITINGFORBUYER', 'WAITINGFORSELLER', 'CANCELLED', 'NOTAVAILABLE' (equals all); The set of order statuses is extensible, users can define their own derived statuses. Default is 'PAID'.",
+                  "schema":{
+                     "type":"string",
+                     "default":"PAID"
+                  }
+               },
+               {
+                  "name":"PaymentDateFrom",
+                  "in":"query",
+                  "description":"When specified will filter orders with payment date after the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"PaymentDateTo",
+                  "in":"query",
+                  "description":"When specified will filter orders with payment date before the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"ShippedDateFrom",
+                  "in":"query",
+                  "description":"When specified will filter orders with shipped date after the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"ShippedDateTo",
+                  "in":"query",
+                  "description":"When specified will filter orders with shipped date before the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"OrderDateFrom",
+                  "in":"query",
+                  "description":"When specified will filter orders created after the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"OrderDateTo",
+                  "in":"query",
+                  "description":"When specified will filter orders created before the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"ExcludeCustomStatuses",
+                  "in":"query",
+                  "description":"If equals 1 then Exclude Custom Statuses in result set",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"ShipmentTrackingSent",
+                  "in":"query",
+                  "description":"If equals 1 then return orders with Shipment Tracking",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"MarketplaceLists",
+                  "in":"query",
+                  "description":"comma-separated list of marketplace codes; Full list of marketplaces could be retrieved from dictionary service",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"ShipToCountries",
+                  "in":"query",
+                  "description":"comma-separated list of coutry codes; Full list of countries could be retrieved from dictionary service",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"SalesChannels",
+                  "in":"query",
+                  "description":"comma-separated list of sales channel codes; Full list of sales channels could be retrieved from dictionary service",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"Warehouses",
+                  "in":"query",
+                  "description":"comma-separated list of warehouse ids; these are ids of objects in the system",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"ProductAttributeId",
+                  "in":"query",
+                  "description":"the id of product attribute if provided; the value is an id of an object in the system",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"ProductAttributeValue",
+                  "in":"query",
+                  "description":"the value of product attribute if provided",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"AdvancedFilters",
+                  "in":"query",
+                  "description":"Advanced Filter",
+                  "schema":{
+                     "type":"string",
+                     "enum":[
+                        "AmazonPrimeOnly",
+                        "EbayGdpOnly",
+                        "AddressVerificationFailed",
+                        "DomesticExpressShipping",
+                        "DomesticStandardShipping",
+                        "HaveGiftMessage",
+                        "HaveWrapInstructions",
+                        "HaveBuyerNotes",
+                        "InternationalOrders",
+                        "ReturnRequested",
+                        "SingleItemOrders"
+                     ]
+                  }
+               },
+               {
+                  "name":"SalesChannelConnectionNicknamesList",
+                  "in":"query",
+                  "description":"comma-separated list of sales channel connection nicknames",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"SearchWithinChildAccounts",
+                  "in":"query",
+                  "description":"When set to True, the response might contain orders that belong to linked child accounts together with the orders of the current (authenticated) account",
+                  "schema":{
+                     "type":"boolean"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/OrdersSearchResult"
+                        }
+                     }
+                  }
+               },
+               "400":{
+                  "description":"Bad request.",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/ErrorMessage"
+                        }
+                     }
+                  }
+               },
+               "401":{
+                  "description":"Authorization information is missing or invalid."
+               },
+               "500":{
+                  "description":"Unexpected error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/ErrorMessage"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post":{
+            "tags":[
+               "Sales Orders"
+            ],
+            "description":"Create order",
+            "parameters":[
+               {
+                  "name":"Authorization",
+                  "in":"header",
+                  "required":true,
+                  "description":"Authorization Token",
+                  "schema":{
+                     "type":"string"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK"
+               },
+               "401":{
+                  "description":"Unauthorized"
+               }
+            },
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "$ref":"#/components/schemas/Order"
+                     }
+                  }
+               },
+               "required":true
+            }
+         }
+      },
+      "/items":{
+         "get":{
+            "tags":[
+               "Sales Orders"
+            ],
+            "description":"Get Order Items",
+            "parameters":[
+               {
+                  "name":"Authorization",
+                  "in":"header",
+                  "required":true,
+                  "description":"Authorization Token",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"Limit",
+                  "description":"Limit the number of orders/items in the result. Deafult is 30.",
+                  "in":"query",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"Offset",
+                  "in":"query",
+                  "description":"The number of items to skip before starting to collect the result. Deafult is 0.",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"InlineCount",
+                  "in":"query",
+                  "description":"When set to 1 generates additional query to count the total number of matching items For better performance when totals are not required set to 0. Default is 1.",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"Columns",
+                  "in":"query",
+                  "description":"Array (comma-separated list) of properties to return; for example 'Id,OrderStatus.DisplayName,OrderDate,OrderTotal,SalesChannel.Name,StoreOrderId,ShipToAddress.Country,ShipToAddress.ContactName'. Defaults are Id, CompanyId, OrderStatus, ShipToAddress, IsPrime,  OrderItemStorageLocation, NotificationStatusEnumValue.",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"OrderBy",
+                  "in":"query",
+                  "description":"Array (comma-separated list) of properties to sort by; each item should contains a property name and order direction (asc/desc); for example 'OrderDate desc,OrderTotal asc'.  Available properties to sort by: 'Id, OrderId, OrderDate, OrderTotal, OrderSubTotal, MustArriveByDate, StoreOrderId, AlternateOrderId, OrderStatus.Name, SalesChannel.Name,  PaymentMethod.Name, PaymentTransactionId, PaymentProcessorId, ShippingMethod.Name, ProductSKU, SalesChannelSKU, OrderItemStorageLocation, InventorySource, InventoryItemCost, OrderItemPrice, OrderItemStatus.Name, POStatus.Name, TotalOrderItemPaidAmount, CostAtTimeOfPurchase, OrderedQty, PackagedQty, ShippedQty, AvailableQty, SalesChannelListingId, Manufacturer, PONumber, CountryOfOrigin, ProductName, ShipToAddress.ContactName, ShipToAddress.ContactCompany, ShipToAddress.Street1, ShipToAddress.Street2, ShipToAddress.City, ShipToAddress.State, ShipToAddress.Zip, ShipToAddress.Country, ShipToAddress.PhoneNumber, ShipToAddress.Email, Buyer.ContactName, Buyer.Street1, Buyer.Street2, Buyer.City, Buyer.State, Buyer.Zip, Buyer.Country, Buyer.PhoneNumber, Buyer.Email'. Default is 'OrderDate desc'. ",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"Timestamp",
+                  "in":"query",
+                  "description":"When specified will filter orders with creation datetime BEFORE the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"Search",
+                  "in":"query",
+                  "description":"The value to search for",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"SearchCode",
+                  "in":"query",
+                  "description":"Defines where to search with the Search value",
+                  "schema":{
+                     "type":"string",
+                     "enum":[
+                        "Id",
+                        "MarketOrderNumber",
+                        "ProductSku",
+                        "PaymentBuyerContact",
+                        "OrderItemListingId",
+                        "OrderItemListingTitle",
+                        "ProductPartialSku",
+                        "PaymentBuyerAddress",
+                        "ProductStandardId",
+                        "ProductManufacturer",
+                        "ProductManufacturerModelNumber",
+                        "OrderItemStorageName",
+                        "AlternateOrderId",
+                        "OrderItemPurchaseOrderId",
+                        "ProductSerialNumber"
+                     ]
+                  }
+               },
+               {
+                  "name":"OrderStatuses",
+                  "in":"query",
+                  "description":"comma-separated list of Order Status codes; the standard values are the following 'PAID'(pending shipment), 'COMPLETED'(shipped), 'PARTIALLYCOMPLETED', 'WAITINGFORBUYER', 'WAITINGFORSELLER', 'CANCELLED', 'NOTAVAILABLE' (equals all); The set of order statuses is extensible, users can define their own derived statuses. Default is 'PAID'.",
+                  "schema":{
+                     "type":"string",
+                     "default":"PAID"
+                  }
+               },
+               {
+                  "name":"PaymentDateFrom",
+                  "in":"query",
+                  "description":"When specified will filter orders with payment date after the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"PaymentDateTo",
+                  "in":"query",
+                  "description":"When specified will filter orders with payment date before the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"ShippedDateFrom",
+                  "in":"query",
+                  "description":"When specified will filter orders with shipped date after the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"ShippedDateTo",
+                  "in":"query",
+                  "description":"When specified will filter orders with shipped date before the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"OrderDateFrom",
+                  "in":"query",
+                  "description":"When specified will filter orders created after the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"OrderDateTo",
+                  "in":"query",
+                  "description":"When specified will filter orders created before the specified value",
+                  "schema":{
+                     "type":"string",
+                     "format":"date-time"
+                  }
+               },
+               {
+                  "name":"ExcludeCustomStatuses",
+                  "in":"query",
+                  "description":"If equals 1 then Exclude Custom Statuses in result set",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"ShipmentTrackingSent",
+                  "in":"query",
+                  "description":"If equals 1 then return orders with Shipment Tracking",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"MarketplaceLists",
+                  "in":"query",
+                  "description":"comma-separated list of marketplace codes; Full list of marketplaces could be retrieved from dictionary service",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"ShipToCountries",
+                  "in":"query",
+                  "description":"comma-separated list of coutry codes; Full list of countries could be retrieved from dictionary service",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"SalesChannels",
+                  "in":"query",
+                  "description":"comma-separated list of sales channel codes; Full list of sales channels could be retrieved from dictionary service",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"Warehouses",
+                  "in":"query",
+                  "description":"comma-separated list of warehouse ids; these are ids of objects in the system",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"ProductAttributeId",
+                  "in":"query",
+                  "description":"the id of product attribute if provided; the value is an id of an object in the system",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"ProductAttributeValue",
+                  "in":"query",
+                  "description":"the value of product attribute if provided",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"AdvancedFilters",
+                  "in":"query",
+                  "description":"Advanced Filter",
+                  "schema":{
+                     "type":"string",
+                     "enum":[
+                        "AmazonPrimeOnly",
+                        "EbayGdpOnly",
+                        "AddressVerificationFailed",
+                        "DomesticExpressShipping",
+                        "DomesticStandardShipping",
+                        "HaveGiftMessage",
+                        "HaveWrapInstructions",
+                        "HaveBuyerNotes",
+                        "InternationalOrders",
+                        "ReturnRequested",
+                        "SingleItemOrders"
+                     ]
+                  }
+               },
+               {
+                  "name":"SalesChannelConnectionNicknamesList",
+                  "in":"query",
+                  "description":"comma-separated list of sales channel connection nicknames",
+                  "schema":{
+                     "type":"string"
+                  }
+               },
+               {
+                  "name":"SearchWithinChildAccounts",
+                  "in":"query",
+                  "description":"When set to True, the response might contain order items that belong to linked child accounts together with the order items of the current (authenticated) account",
+                  "schema":{
+                     "type":"boolean"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/ItemsSearchResult"
+                        }
+                     }
+                  }
+               },
+               "400":{
+                  "description":"Bad request.",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/ErrorMessage"
+                        }
+                     }
+                  }
+               },
+               "401":{
+                  "description":"Authorization information is missing or invalid."
+               },
+               "500":{
+                  "description":"Unexpected error",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/ErrorMessage"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/orders/{orderId}/returns":{
+         "get":{
+            "tags":[
+               "Returns"
+            ],
+            "description":"Get Returns requested for Sales Order",
+            "parameters":[
+               {
+                  "name":"orderId",
+                  "in":"path",
+                  "required":true,
+                  "description":"Order Id",
+                  "schema":{
+                     "type":"integer"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "type":"array",
+                           "items":{
+                              "$ref":"#/components/schemas/Return"
+                           }
+                        }
+                     }
+                  }
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "404":{
+                  "description":"Order not found"
+               }
+            }
+         },
+         "post":{
+            "tags":[
+               "Returns"
+            ],
+            "description":"Create a new Return for Sales Order",
+            "parameters":[
+               {
+                  "name":"orderId",
+                  "in":"path",
+                  "required":true,
+                  "description":"Order Id",
+                  "schema":{
+                     "type":"integer"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK"
+               },
+               "400":{
+                  "description":"Bad request.",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/ErrorMessage"
+                        }
+                     }
+                  }
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "404":{
+                  "description":"Order not found"
+               }
+            },
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "$ref":"#/components/schemas/NewReturn"
+                     }
+                  }
+               },
+               "required":true
+            }
+         }
+      },
+      "/orders/{orderId}/returns/{returnId}":{
+         "delete":{
+            "tags":[
+               "Returns"
+            ],
+            "description":"Delete Return requested for Sales Order",
+            "parameters":[
+               {
+                  "name":"orderId",
+                  "in":"path",
+                  "required":true,
+                  "description":"Order Id",
+                  "schema":{
+                     "type":"integer"
+                  }
+               },
+               {
+                  "name":"returnId",
+                  "in":"path",
+                  "required":true,
+                  "description":"Return Id",
+                  "schema":{
+                     "type":"integer"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK"
+               },
+               "400":{
+                  "description":"Deleting a return in any other status than 'Requested' is not allowed"
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "404":{
+                  "description":"Order Return not found"
+               }
+            }
+         }
+      }
+   },
+   "components":{
+      "schemas":{
+         "OrdersSearchResult":{
+            "type":"object",
+            "properties":{
+               "Orders":{
+                  "type":"array",
+                  "items":{
+                     "type":"object",
+                     "properties":{
+                        "Id":{
+                           "type":"integer",
+                           "description":"Order Id"
+                        },
+                        "AlternateOrderId":{
+                           "type":"string",
+                           "description":"Alternate Order Id"
+                        },
+                        "StoreOrderId":{
+                           "type":"string",
+                           "description":"Marketplace Order Id"
+                        },
+                        "CompanyId":{
+                           "type":"integer",
+                           "description":"The Company Id"
+                        },
+                        "OrderStatus":{
+                           "type":"object",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Order Status Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Order Status Name"
+                              },
+                              "DisplayName":{
+                                 "type":"string",
+                                 "description":"Order Status Display Name"
+                              },
+                              "HtmlColor":{
+                                 "type":"string",
+                                 "description":"Order Status Display Color"
+                              }
+                           }
+                        },
+                        "OrderDate":{
+                           "type":"string",
+                           "format":"date-time",
+                           "description":"Order Date"
+                        },
+                        "OrderTotal":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Total"
+                        },
+                        "OrderSubTotal":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Sub Total"
+                        },
+                        "SalesChannel":{
+                           "type":"object",
+                           "description":"Sales Channel",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Sales Channel Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Sales Channel Name"
+                              }
+                           }
+                        },
+                        "MarketplaceShippingMethod":{
+                           "type":"string",
+                           "description":"Marketplace Shipping Method"
+                        },
+                        "TotalShippingFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total Shipping Fee"
+                        },
+                        "InsuranceFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Insurance Fee"
+                        },
+                        "TotalOrderDiscount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total Order Discount"
+                        },
+                        "OrderDiscount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Discount"
+                        },
+                        "TotalTaxAmount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total Tax Amount"
+                        },
+                        "OrderTaxAmount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Tax Amount"
+                        },
+                        "ItemsCount":{
+                           "type":"integer",
+                           "description":"Items Count"
+                        },
+                        "ShipToAddress":{
+                           "$ref":"#/components/schemas/Address"
+                        },
+                        "RecipientInstructions":{
+                           "type":"string",
+                           "description":"Recipient Instructions"
+                        },
+                        "RecipientStoreScreenName":{
+                           "type":"string",
+                           "description":"Recipient Store Screen Name"
+                        },
+                        "GiftMessage":{
+                           "type":"string",
+                           "description":"Gift Message"
+                        },
+                        "MustArriveByDate":{
+                           "type":"string",
+                           "format":"date-time",
+                           "description":"Order should arrive by this date"
+                        },
+                        "IsPrime":{
+                           "type":"boolean",
+                           "description":"If order is Amazon Prime"
+                        },
+                        "ShippingMethod":{
+                           "type":"object",
+                           "description":"Shipping Method",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Shipping Method Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Shipping Method Name"
+                              }
+                           }
+                        },
+                        "OrderGiftWrapFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Gift Wrap Fee"
+                        },
+                        "TotalGiftWrapFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total Gift Wrap Fee"
+                        },
+                        "Buyer":{
+                           "$ref":"#/components/schemas/Address"
+                        },
+                        "PaymentMethod":{
+                           "type":"object",
+                           "description":"Payment Method",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Payment Method Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Payment Method Name"
+                              }
+                           }
+                        },
+                        "PaymentTransactionId":{
+                           "type":"string",
+                           "description":"Payment Transaction Id"
+                        }
+                     }
+                  }
+               },
+               "Totals":{
+                  "$ref":"#/components/schemas/Totals"
+               }
+            }
+         },
+         "ItemsSearchResult":{
+            "type":"object",
+            "properties":{
+               "Items":{
+                  "type":"array",
+                  "items":{
+                     "type":"object",
+                     "properties":{
+                        "Id":{
+                           "type":"integer",
+                           "description":"Order Item Id"
+                        },
+                        "SalesChannelOrderItemId":{
+                           "type":"string",
+                           "description":"Sales Channel Order Item Id"
+                        },
+                        "SalesChannelListingId":{
+                           "type":"string",
+                           "description":"Sales Channel Listing Id"
+                        },
+                        "ItemTitle":{
+                           "type":"string",
+                           "description":"Item Title"
+                        },
+                        "OrderItemStatus":{
+                           "type":"object",
+                           "description":"Order Item Status",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Order Item Status Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Order Item Status Name"
+                              }
+                           }
+                        },
+                        "OrderItemPrice":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Item Price"
+                        },
+                        "TotalOrderItemPaidAmount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total Order Item Paid Amount"
+                        },
+                        "PerItemFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Per Item Fee"
+                        },
+                        "Total":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total"
+                        },
+                        "CostAtTimeOfPurchase":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Cost at the time of purchase"
+                        },
+                        "OrderedQty":{
+                           "type":"integer",
+                           "description":"Ordered Quantity"
+                        },
+                        "AvailableQty":{
+                           "type":"integer",
+                           "description":"Available Quantity"
+                        },
+                        "OrderItemStorageLocation":{
+                           "type":"string",
+                           "description":"Order Item Storage Location"
+                        },
+                        "TotalShippingFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Total Shipping Fee"
+                        },
+                        "SalesTaxAmount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Sales Tax Amount"
+                        },
+                        "ItemGiftWrapFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Item Gift Wrap Fee"
+                        },
+                        "ItemGiftWrap":{
+                           "type":"string",
+                           "description":"Item Gift Wrap"
+                        },
+                        "ItemGiftMessage":{
+                           "type":"string",
+                           "description":"Item Gift Message"
+                        },
+                        "InventoryItemCost":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Inventory Item Cost"
+                        },
+                        "InventorySource":{
+                           "type":"string",
+                           "description":"Inventory Source"
+                        },
+                        "InventoryItemCondition":{
+                           "type":"string",
+                           "description":"Inventory Item Condition"
+                        },
+                        "InsuranceRequested":{
+                           "type":"boolean",
+                           "description":"Insurance Requested"
+                        },
+                        "InsuranceFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Insurance Fee"
+                        },
+                        "CommissionFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Commission Fee"
+                        },
+                        "DiscountAmount":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Discount Amount"
+                        },
+                        "ProductSKU":{
+                           "type":"string",
+                           "description":"Product SKU"
+                        },
+                        "ProductName":{
+                           "type":"string",
+                           "description":"Product Name"
+                        },
+                        "Upc":{
+                           "type":"string",
+                           "description":"Upc"
+                        },
+                        "Isbn":{
+                           "type":"string",
+                           "description":"Isbn"
+                        },
+                        "ProductIsTaxable":{
+                           "type":"boolean",
+                           "description":"Product Is Taxable"
+                        },
+                        "ProductWeight":{
+                           "type":"object",
+                           "properties":{
+                              "Weight":{
+                                 "type":"number",
+                                 "format":"float",
+                                 "description":"Product Weight"
+                              },
+                              "MeasurementUnit":{
+                                 "type":"string",
+                                 "description":"Measurement Unit",
+                                 "enum":[
+                                    "ounces",
+                                    "pounds",
+                                    "grams",
+                                    "kilograms"
+                                 ]
+                              }
+                           }
+                        },
+                        "ModelNumber":{
+                           "type":"string",
+                           "description":"Model Number"
+                        },
+                        "MainImageUrl":{
+                           "type":"string",
+                           "description":"MainImageUrl"
+                        },
+                        "Manufacturer":{
+                           "type":"string",
+                           "description":"Manufacturer"
+                        },
+                        "PONumber":{
+                           "type":"integer",
+                           "description":"PO Number"
+                        },
+                        "CountryOfOrigin":{
+                           "type":"string",
+                           "description":"Country of Origin"
+                        },
+                        "POStatus":{
+                           "type":"object",
+                           "description":"PO Status",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"PO Status Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"PO Status Name"
+                              }
+                           }
+                        },
+                        "ProductAttributes":{
+                           "type":"array",
+                           "items":{
+                              "type":"object",
+                              "properties":{
+                                 "AttributeId":{
+                                    "type":"integer",
+                                    "description":"Product Atrribute Id"
+                                 },
+                                 "AttributeName":{
+                                    "type":"string",
+                                    "description":"Product Atrribute Name"
+                                 }
+                              }
+                           }
+                        },
+                        "PackageDimensions":{
+                           "type":"object",
+                           "properties":{
+                              "Width":{
+                                 "type":"number",
+                                 "format":"float",
+                                 "description":"Package Width"
+                              },
+                              "Length":{
+                                 "type":"number",
+                                 "format":"float",
+                                 "description":"Package Length"
+                              },
+                              "Height":{
+                                 "type":"number",
+                                 "format":"float",
+                                 "description":"Package Height"
+                              },
+                              "MeasurementUnit":{
+                                 "type":"string",
+                                 "description":"Measurement Unit",
+                                 "enum":[
+                                    "inches",
+                                    "centimeters",
+                                    "meters"
+                                 ]
+                              }
+                           }
+                        },
+                        "PackagedQty":{
+                           "type":"integer",
+                           "description":"Packaged Quantity"
+                        },
+                        "MustArriveByDate":{
+                           "type":"string",
+                           "format":"date-time",
+                           "description":"Order should arrive by this date"
+                        },
+                        "MarketplaceShippingMethod":{
+                           "type":"string",
+                           "description":"Marketplace Shipping Method"
+                        },
+                        "ShippingMethod":{
+                           "type":"object",
+                           "description":"Shipping Method",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Shipping Method Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Shipping Method Name"
+                              }
+                           }
+                        },
+                        "ShippingFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Shipping Fee"
+                        },
+                        "ShippedQty":{
+                           "type":"integer",
+                           "description":"Shipped Quantity"
+                        },
+                        "ShipToAddress":{
+                           "$ref":"#/components/schemas/Address"
+                        },
+                        "CompanyId":{
+                           "type":"integer",
+                           "description":"The Company Id"
+                        },
+                        "OrderId":{
+                           "type":"string",
+                           "description":"Order Id"
+                        },
+                        "AlternateOrderId":{
+                           "type":"string",
+                           "description":"Alternate Order Id"
+                        },
+                        "StoreOrderId":{
+                           "type":"string",
+                           "description":"Marketplace Order Id"
+                        },
+                        "OrderStatus":{
+                           "type":"object",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Order Status Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Order Status Name"
+                              },
+                              "DisplayName":{
+                                 "type":"string",
+                                 "description":"Order Status Display Name"
+                              },
+                              "HtmlColor":{
+                                 "type":"string",
+                                 "description":"Order Status Display Color"
+                              }
+                           }
+                        },
+                        "OrderDate":{
+                           "type":"string",
+                           "format":"date-time",
+                           "description":"Order Date"
+                        },
+                        "OrderIsPrime":{
+                           "type":"boolean",
+                           "description":"If order is Amazon Prime"
+                        },
+                        "IsGDP":{
+                           "type":"boolean",
+                           "description":"If order is under eBay Guaranteed Delivery Program"
+                        },
+                        "IsFBA":{
+                           "type":"boolean",
+                           "description":"If order item is fulfilled by Amazon"
+                        },
+                        "SalesChannel":{
+                           "type":"object",
+                           "description":"Sales Channel",
+                           "properties":{
+                              "Code":{
+                                 "type":"string",
+                                 "description":"Sales Channel Code"
+                              },
+                              "Name":{
+                                 "type":"string",
+                                 "description":"Sales Channel Name"
+                              }
+                           }
+                        },
+                        "OrderSubTotal":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Sub Total"
+                        },
+                        "RecipientStoreScreenName":{
+                           "type":"string",
+                           "description":"Recipient Store Screen Name"
+                        },
+                        "OrderGiftWrapFee":{
+                           "type":"number",
+                           "format":"float",
+                           "description":"Order Gift Wrap Fee"
+                        },
+                        "OrderGiftMessage":{
+                           "type":"string",
+                           "description":"Order Gift Message"
+                        },
+                        "RecipientInstructions":{
+                           "type":"string",
+                           "description":"Buyer Notes"
+                        },
+                        "Buyer":{
+                           "$ref":"#/components/schemas/Address"
+                        },
+                        "SalesChannelSKU":{
+                           "type":"string",
+                           "description":"Sales Channel SKU"
+                        },
+                        "StoreNotificationStatus":{
+                           "type":"string",
+                           "description":"Store Notification Status"
+                        }
+                     }
+                  }
+               },
+               "Totals":{
+                  "$ref":"#/components/schemas/Totals"
+               }
+            }
+         },
+         "Address":{
+            "type":"object",
+            "properties":{
+               "AddressId":{
+                  "type":"integer",
+                  "description":"Address Id"
+               },
+               "AddressNotes":{
+                  "type":"string",
+                  "description":"Address Notes"
+               },
+               "AddressTitle":{
+                  "type":"string",
+                  "description":"Address Title"
+               },
+               "ContactName":{
+                  "type":"string",
+                  "description":"Contact Name"
+               },
+               "ContactCompany":{
+                  "type":"string",
+                  "description":"Contact Company"
+               },
+               "Street1":{
+                  "type":"string",
+                  "description":"The street line 1 of the address"
+               },
+               "Street2":{
+                  "type":"string",
+                  "description":"The street line 2 of the address"
+               },
+               "City":{
+                  "type":"string",
+                  "description":"The city the address is located in"
+               },
+               "State":{
+                  "type":"string",
+                  "description":"The state or province the address is located in"
+               },
+               "CountryCode":{
+                  "type":"string",
+                  "description":"The country code (ISO3166)"
+               },
+               "Country":{
+                  "type":"string",
+                  "description":"The country name"
+               },
+               "Zip":{
+                  "type":"string",
+                  "description":"Zip code"
+               },
+               "PhoneNumber":{
+                  "type":"string",
+                  "description":"Phone Number"
+               },
+               "CellularNumber":{
+                  "type":"string",
+                  "description":"Cellular Number"
+               },
+               "Email":{
+                  "type":"string",
+                  "description":"Email"
+               },
+               "Fax":{
+                  "type":"string",
+                  "description":"Fax"
+               },
+               "Website":{
+                  "type":"string",
+                  "description":"Website"
+               }
+            }
+         },
+         "Totals":{
+            "type":"object",
+            "properties":{
+               "OrderCount":{
+                  "type":"integer",
+                  "description":"Total Orders count found by filter provided"
+               },
+               "ItemCount":{
+                  "type":"integer",
+                  "description":"Total Order Items count found by filter provided"
+               }
+            }
+         },
+         "ErrorMessage":{
+            "type":"object",
+            "properties":{
+               "message":{
+                  "type":"string",
+                  "description":"Error Details"
+               }
+            }
+         },
+         "Return":{
+            "type":"object",
+            "properties":{
+               "Id":{
+                  "type":"integer",
+                  "description":"Return Id"
+               },
+               "OrderId":{
+                  "type":"integer",
+                  "description":"Order Id"
+               },
+               "ReturnStatus":{
+                  "type":"object",
+                  "description":"Return Status",
+                  "properties":{
+                     "Code":{
+                        "type":"string",
+                        "description":"Return Status Code"
+                     },
+                     "Name":{
+                        "type":"string",
+                        "description":"Return Status Name"
+                     }
+                  }
+               },
+               "ReturnReason":{
+                  "type":"object",
+                  "description":"Return Reason",
+                  "properties":{
+                     "Code":{
+                        "type":"string",
+                        "description":"Return Reason Code"
+                     },
+                     "Name":{
+                        "type":"string",
+                        "description":"Return Reason Name"
+                     }
+                  }
+               },
+               "ShippingPaymentOption":{
+                  "type":"object",
+                  "description":"Who pays for Return Shipping",
+                  "properties":{
+                     "Code":{
+                        "type":"string",
+                        "description":"Shipping Payment Option Code"
+                     },
+                     "Name":{
+                        "type":"string",
+                        "description":"Shipping Payment Options Name"
+                     }
+                  }
+               },
+               "BuyerEmail":{
+                  "type":"string",
+                  "description":"Buyer Email"
+               },
+               "BuyerNote":{
+                  "type":"string",
+                  "description":"Buyer Note"
+               },
+               "RmaNumber":{
+                  "type":"string",
+                  "description":"Rma Number"
+               },
+               "SellerNote":{
+                  "type":"string",
+                  "description":"Seller Note"
+               },
+               "PaidByPayPal":{
+                  "type":"boolean",
+                  "description":"Flag indicates if Return refunded by Pay Pal"
+               },
+               "TotalRefund":{
+                  "type":"number",
+                  "format":"float",
+                  "description":"Total Refund"
+               },
+               "EstimatedRefund":{
+                  "type":"number",
+                  "format":"float",
+                  "description":"Estimated Refund"
+               },
+               "IsManual":{
+                  "type":"boolean",
+                  "description":"Flag indicates if Return was created manually"
+               },
+               "TrackingNumber":{
+                  "type":"string",
+                  "description":"Return Tracking Number"
+               },
+               "ShipWith":{
+                  "type":"string",
+                  "description":"Shipping carrier for Return"
+               },
+               "Warehouse":{
+                  "type":"object",
+                  "properties":{
+                     "Id":{
+                        "type":"integer",
+                        "description":"Warehouse Id"
+                     },
+                     "Name":{
+                        "type":"string",
+                        "description":"Warehouse Name"
+                     },
+                     "ListType":{
+                        "type":"object",
+                        "description":"Local or Fulfillment Warehouse, Vendor etc.",
+                        "properties":{
+                           "Code":{
+                              "type":"string",
+                              "description":"List Type Code"
+                           },
+                           "Name":{
+                              "type":"string",
+                              "description":"List Type Name"
+                           }
+                        }
+                     },
+                     "ExternalWarehouseId":{
+                        "type":"string",
+                        "description":"External Warehouse Id"
+                     },
+                     "Address":{
+                        "$ref":"#/components/schemas/Address"
+                     }
+                  }
+               },
+               "CustomAddress":{
+                  "$ref":"#/components/schemas/Address"
+               },
+               "Items":{
+                  "type":"array",
+                  "items":{
+                     "$ref":"#/components/schemas/ReturnItem"
+                  }
+               }
+            }
+         },
+         "ReturnItem":{
+            "type":"object",
+            "properties":{
+               "Slid":{
+                  "type":"integer",
+                  "description":"Order Item Id"
+               },
+               "SKU":{
+                  "type":"string",
+                  "description":"Item SKU"
+               },
+               "ReturnQty":{
+                  "type":"integer",
+                  "description":"Qty requested for Return"
+               },
+               "ReceivedQty":{
+                  "type":"integer",
+                  "description":"Actual Qty received in the Warehouse"
+               },
+               "ProductId":{
+                  "type":"integer",
+                  "description":"Product Id"
+               },
+               "ProductName":{
+                  "type":"string",
+                  "description":"Product Name"
+               },
+               "MainImageUrl":{
+                  "type":"string",
+                  "description":"Product Main Image Url"
+               },
+               "ActualPriceRefund":{
+                  "type":"number",
+                  "format":"float",
+                  "description":"Actual Price Refund"
+               },
+               "ActualOriginalShippingRefund":{
+                  "type":"number",
+                  "format":"float",
+                  "description":"Actual Original Shipping Refund"
+               },
+               "ActualPriceTaxRefund":{
+                  "type":"number",
+                  "format":"float",
+                  "description":"Actual Price Tax Refund"
+               },
+               "ActualShippingTaxRefund":{
+                  "type":"number",
+                  "format":"float",
+                  "description":"Actual Shipping Tax Refund"
+               },
+               "DispositionCode":{
+                  "type":"object",
+                  "description":"Indicates if returned items are sellable",
+                  "properties":{
+                     "Code":{
+                        "type":"string",
+                        "description":"Disposition Code Code"
+                     },
+                     "Name":{
+                        "type":"string",
+                        "description":"Disposition Code Name"
+                     }
+                  }
+               }
+            }
+         },
+         "NewReturn":{
+            "type":"object",
+            "properties":{
+               "ReturnReason":{
+                  "type":"object",
+                  "description":"Return Reason",
+                  "properties":{
+                     "Code":{
+                        "type":"string",
+                        "description":"Return Reason Code",
+                        "example":"I_CHANGED_MY_MIND"
+                     },
+                     "Name":{
+                        "type":"string",
+                        "example":"Changed my mind",
+                        "description":"Return Reason Name"
+                     }
+                  }
+               },
+               "BuyerNote":{
+                  "type":"string",
+                  "description":"Buyer Note"
+               },
+               "Items":{
+                  "type":"array",
+                  "items":{
+                     "type":"object",
+                     "properties":{
+                        "Slid":{
+                           "type":"integer",
+                           "example":12345,
+                           "description":"Order Item Id"
+                        },
+                        "ReturnQty":{
+                           "type":"integer",
+                           "example":1,
+                           "description":"Return Qty"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "Order":{
+            "type":"object",
+            "properties":{
+               "SalesChannelCode":{
+                  "type":"string",
+                  "description":"Sales Channel code"
+               },
+               "SalesChannelOrderId":{
+                  "type":"string",
+                  "description":"Sales Channel Order Id"
+               },
+               "AlternateOrderId":{
+                  "type":"string",
+                  "description":"Alternate Order Id"
+               },
+               "OrderDate":{
+                  "type":"string",
+                  "format":"date-time",
+                  "description":"Order date"
+               },
+               "SalesChannelShippingMethod":{
+                  "type":"string",
+                  "description":"Buyer requested shipping method"
+               },
+               "OrderStatusCode":{
+                  "type":"string",
+                  "description":"Order status"
+               },
+               "TaxAmount":{
+                  "type":"number",
+                  "description":"Tax amount"
+               },
+               "TaxRate":{
+                  "type":"number",
+                  "description":"Tax rate"
+               },
+               "ShippingFee":{
+                  "type":"number",
+                  "description":"Order shipping fee"
+               },
+               "InsuranceFee":{
+                  "type":"number",
+                  "description":"Order insurance fee"
+               },
+               "GiftWrapFee":{
+                  "type":"number",
+                  "description":"Order gift wrap fee"
+               },
+               "DiscountAmount":{
+                  "type":"number",
+                  "description":"Order discount amount"
+               },
+               "GiftMessage":{
+                  "type":"string",
+                  "description":"Gift message"
+               },
+               "ShipToAddress":{
+                  "$ref":"#/components/schemas/OrderShipToAddress"
+               },
+               "Items":{
+                  "type":"array",
+                  "$ref":"#/components/schemas/OrderItem"
+               }
+            },
+            "required":[
+               "SalesChannelCode",
+               "SalesChannelOrderId",
+               "OrderDate",
+               "ShipToAddress",
+               "Items"
+            ]
+         },
+         "OrderItem":{
+            "type":"object",
+            "properties":{
+               "SalesChannelSku":{
+                  "type":"string",
+                  "description":"Sales Channel sku"
+               },
+               "ItemTitle":{
+                  "type":"string",
+                  "description":"Product name"
+               },
+               "OrderedQuantity":{
+                  "type":"number",
+                  "description":"Ordered quantity"
+               },
+               "ItemPrice":{
+                  "type":"number",
+                  "description":"Item price"
+               },
+               "SalesChannelOrderItemId":{
+                  "type":"string",
+                  "description":"Sales channel order item id/line number"
+               },
+               "OrderItemStatusCode":{
+                  "type":"string",
+                  "description":"Order item status"
+               },
+               "TaxAmount":{
+                  "type":"number",
+                  "description":"Tax amount"
+               },
+               "ShippingFee":{
+                  "type":"number",
+                  "description":"Order shipping fee"
+               },
+               "InsuranceFee":{
+                  "type":"number",
+                  "description":"Order insurance fee"
+               },
+               "InsuranceRequested":{
+                  "type":"boolean",
+                  "description":"Insurance Requested"
+               },
+               "GiftWrapFee":{
+                  "type":"number",
+                  "description":"Order gift wrap fee"
+               },
+               "DiscountAmount":{
+                  "type":"number",
+                  "description":"Order discount amount"
+               },
+               "CommissionFee":{
+                  "type":"number",
+                  "description":"Comission fee"
+               },
+               "GiftWrap":{
+                  "type":"string",
+                  "description":"Gift wrap"
+               },
+               "GiftMessage":{
+                  "type":"string",
+                  "description":"Gift message"
+               },
+               "Upc":{
+                  "type":"string",
+                  "description":"UPC"
+               },
+               "ModelNumber":{
+                  "type":"string",
+                  "description":"Model number"
+               },
+               "Manufacturer":{
+                  "type":"string",
+                  "description":"Manufacturer"
+               }
+            },
+            "required":[
+               "SalesChannelSku",
+               "ItemTitle",
+               "OrderedQuantity",
+               "ItemPrice"
+            ]
+         },
+         "OrderShipToAddress":{
+            "type":"object",
+            "properties":{
+               "ContactName":{
+                  "type":"string",
+                  "description":"Contact Name"
+               },
+               "ContactCompany":{
+                  "type":"string",
+                  "description":"Contact Company"
+               },
+               "Street1":{
+                  "type":"string",
+                  "description":"The street line 1 of the address"
+               },
+               "Street2":{
+                  "type":"string",
+                  "description":"The street line 2 of the address"
+               },
+               "City":{
+                  "type":"string",
+                  "description":"The city the address is located in"
+               },
+               "State":{
+                  "type":"string",
+                  "description":"The state or province the address is located in"
+               },
+               "Country":{
+                  "type":"string",
+                  "description":"The country name"
+               },
+               "Zip":{
+                  "type":"string",
+                  "description":"Zip code"
+               },
+               "PhoneNumber":{
+                  "type":"string",
+                  "description":"Phone Number"
+               },
+               "Email":{
+                  "type":"string",
+                  "description":"Email"
+               }
+            },
+            "required":[
+               "ContactName",
+               "Street1",
+               "City",
+               "State",
+               "Country",
+               "Zip",
+               "PhoneNumber"
+            ]
+         }
+      }
+   },
+   "x-explorer-enabled":true,
+   "x-proxy-enabled":true,
+   "x-samples-enabled":true,
+   "x-samples-languages":[
+      "curl",
+      "node",
+      "ruby",
+      "javascript",
+      "python"
+   ]
+}
