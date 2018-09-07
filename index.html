@@ -16,31 +16,31 @@
                 "operationId": "documentReplace",
                 "parameters": [
                     {
-                        "name": "If-Match",
+                        "name": "Header",
                         "in": "header",
-                        "description": "example header",
+                        "description": "header",
                         "required": true,
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
-                        "name": "bodyParam",
-                        "in": "body",
-                        "description": "example body param",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "documentId",
+                        "name": "documentIdpath",
                         "in": "path",
-                        "description": "example path param",
+                        "description": "path",
                         "required": true,
                         "schema": {
                             "type": "string",
                             "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "body",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 ],
