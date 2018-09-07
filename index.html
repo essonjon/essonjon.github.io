@@ -16,15 +16,6 @@
                 "operationId": "documentReplace",
                 "parameters": [
                     {
-                        "name": "Header",
-                        "in": "header",
-                        "description": "header",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "documentIdpath",
                         "in": "path",
                         "description": "path",
@@ -39,6 +30,15 @@
                         "in": "body",
                         "description": "body",
                         "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Header",
+                        "in": "header",
+                        "description": "header",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
