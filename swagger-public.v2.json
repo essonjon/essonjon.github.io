@@ -1,0 +1,360 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "v2",
+    "title" : "Tickets"
+  },
+  "host" : "api.hubapi.com",
+  "basePath" : "/crm-objects",
+  "tags" : [ {
+    "name" : "Properties",
+    "description" : "Manage the metadata fields available on the ticket object"
+  }, {
+    "name" : "Core",
+    "description" : "Read and write tickets one at a time"
+  } ],
+  "schemes" : [ "https" ],
+  "paths" : {
+    "/v2/tickets" : {
+      "get" : {
+        "tags" : [ "Core" ],
+        "summary" : "Get a paged list of tickets",
+        "operationId" : "get-/crm-objects/v2/tickets",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "type" : "number",
+          "default" : 10.0,
+          "format" : "int32"
+        }, {
+          "name" : "after",
+          "in" : "query",
+          "description" : "A cursor token for paging through results. This should be provided for you in `pagingLinks.next` property in a paged response.",
+          "required" : false,
+          "type" : "string",
+          "default" : "0",
+          "format" : "int64"
+        }, {
+          "name" : "properties",
+          "in" : "query",
+          "required" : false,
+          "description" : "A list of property names to include in the response",
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "collectionFormat" : "multi"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/SimplePublicObjectPageWithUri"
+            }
+          },
+          "default" : {
+            "$ref" : "#/responses/Error"
+          }
+        },
+        "security" : [ {
+          "oauth2" : [ "contacts" ]
+        }, {
+          "hapikey" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Core" ],
+        "summary" : "Create a ticket",
+        "description" : "Create a ticket by providing a map of property names and values. If any invalid or read-only properties are included in the create request, a `400 Bad Request` error will be thrown.\n\nRequired properties:\n  * `subject` (Ticket name)\n  * `hs_pipeline` (Pipeline name)\n  * `hs_pipeline_stage` (Pipeline stage)",
+        "operationId" : "post-/crm-objects/v2/tickets",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/PublicCreateObjectRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/SimplePublicObject"
+            }
+          },
+          "default" : {
+            "$ref" : "#/responses/Error"
+          }
+        },
+        "security" : [ {
+          "oauth2" : [ "contacts" ]
+        }, {
+          "hapikey" : [ ]
+        } ]
+      }
+    },
+    "/v2/tickets/properties" : {
+      "get" : {
+        "tags" : [ "Properties" ],
+        "summary" : "List ticket properties",
+        "description" : "List the properties (aka metadata fields) available for all tickets, which can vary across HubSpot accounts based on configuration",
+        "operationId" : "get-/crm-objects/v2/tickets/properties",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "uniqueItems" : true,
+              "items" : {
+                "type" : "string"
+              }
+            },
+            "examples" : {
+              "application/json" : [ "closed_date", "content", "created_by", "createdate", "first_agent_reply_date", "hs_all_accessible_team_ids", "hs_all_owner_ids", "hs_all_team_ids", "hs_custom_inbox", "hs_external_object_ids", "hs_feedback_last_ces_follow_up", "hs_feedback_last_ces_rating", "hs_feedback_last_survey_date", "hs_file_upload", "hs_last_email_activity", "hs_lastactivitydate", "hs_lastcontacted", "hs_lastmodifieddate", "hs_merged_object_ids", "hs_nextactivitydate", "hs_num_times_contacted", "hs_object_id", "hs_originating_email_engagement_id", "hs_pipeline", "hs_pipeline_stage", "hs_resolution", "hs_ticket_category", "hs_ticket_id", "hs_ticket_priority", "hubspot_owner_assigneddate", "hubspot_owner_id", "hubspot_team_id", "last_engagement_date", "last_reply_date", "nps_follow_up_answer", "nps_follow_up_question_version", "nps_score", "source_ref", "source_thread_id", "source_type", "subject", "tags", "time_to_close", "time_to_first_agent_reply" ]
+            }
+          },
+          "default" : {
+            "$ref" : "#/responses/Error"
+          }
+        },
+        "security" : [ {
+          "oauth2" : [ "contacts" ]
+        }, {
+          "hapikey" : [ ]
+        } ]
+      }
+    },
+    "/v2/tickets/{id}" : {
+      "get" : {
+        "tags" : [ "Core" ],
+        "summary" : "Get the details for a single ticket by ID",
+        "operationId" : "get-/crm-objects/v2/tickets/{id}",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "properties",
+          "in" : "query",
+          "required" : false,
+          "description" : "A list of property names to include in the response",
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "collectionFormat" : "multi"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/SimplePublicObject"
+            }
+          },
+          "default" : {
+            "$ref" : "#/responses/Error"
+          }
+        },
+        "security" : [ {
+          "oauth2" : [ "contacts" ]
+        }, {
+          "hapikey" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Core" ],
+        "summary" : "Archive a ticket",
+        "operationId" : "delete-/crm-objects/v2/tickets/{id}",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No content"
+          },
+          "default" : {
+            "$ref" : "#/responses/Error"
+          }
+        },
+        "security" : [ {
+          "oauth2" : [ "contacts" ]
+        }, {
+          "hapikey" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "Core" ],
+        "summary" : "Update ticket properties",
+        "description" : "Perform a partial update of a tickets properties. Any properties that are provided will be written to the ticket object. Read-only properties will be ignored.",
+        "operationId" : "patch-/crm-objects/v2/tickets/{id}",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "properties": {},
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/SimplePublicObject"
+            }
+          },
+          "default" : {
+            "$ref" : "#/responses/Error"
+          }
+        },
+        "security" : [ {
+          "oauth2" : [ "contacts" ]
+        }, {
+          "hapikey" : [ ]
+        } ]
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "oauth2" : {
+      "type" : "oauth2",
+      "authorizationUrl" : "https://app.hubspot.com/oauth/authorize",
+      "tokenUrl" : "https://api.hubapi.com/oauth/v1/token",
+      "flow" : "accessCode",
+      "scopes" : {
+        "contacts" : ""
+      }
+    },
+    "hapikey" : {
+      "type" : "apiKey",
+      "name" : "hapikey",
+      "in" : "query"
+    }
+  },
+  "definitions" : {
+    "Error" : {
+      "required" : [ "message", "requestId", "status" ],
+      "properties" : {
+        "status" : {
+          "type" : "string",
+          "example" : "error",
+          "description" : "The string \"error\""
+        },
+        "message" : {
+          "type" : "string",
+          "example" : "An error occurred",
+          "description" : "A human readable message describing the error along with remediation steps where appropriate"
+        },
+        "requestId" : {
+          "type" : "string",
+          "example" : "57b91660deded96e827d7ef9535988a5",
+          "description" : "A unique identifier for the request. Include this value with any error reports or support tickets",
+          "pattern" : "[a-zA-Z0-9]{32}"
+        }
+      }
+    },
+    "PublicCreateObjectRequest" : {
+      "type" : "object",
+      "properties" : {
+        "properties" : {
+          "type" : "object",
+          "properties": {},
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      },
+      "example" : {
+        "properties" : {
+          "subject" : "Ticket name",
+          "content" : "Ticket description",
+          "hs_pipeline" : "0",
+          "hs_pipeline_stage" : "1",
+          "hs_resolution" : "ISSUE_FIXED",
+          "hs_ticket_category" : "HIGH",
+          "source_type" : "EMAIL",
+          "hubspot_owner_id" : "6194807"
+        }
+      }
+    },
+    "SimplePublicObject" : {
+      "type" : "object",
+      "required" : [ "createdAt", "updatedAt" ],
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "properties" : {
+          "type" : "object",
+          "properties": {},
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        },
+        "createdAt" : {
+          "type" : "integer"
+        },
+        "updatedAt" : {
+          "type" : "integer"
+        },
+        "associations" : {
+          "type" : "object",
+          "properties": {},
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "SimplePublicObjectPageWithUri" : {
+      "type" : "object",
+      "properties" : {
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/SimplePublicObject"
+          }
+        },
+        "next" : {
+          "type" : "string"
+        }
+      }
+    }
+  },
+  "responses" : {
+    "Error" : {
+      "description" : "An Error Occurred.",
+      "schema" : {
+        "$ref" : "#/definitions/Error"
+      }
+    }
+  }
+}
