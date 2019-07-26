@@ -1,106 +1,2605 @@
 {
   "openapi": "3.0.0",
-  "servers": [
+  "info": {
+    "version": "3.0",
+    "title": "inSync"
+  },
+  "x-explorer-enabled": true,
+  "tags": [
     {
-      "url": "http://example.com"
+      "name": "User Management",
+      "description": "Lists the APIs to get information and perform operations on users managed in Druva inSync."
+    },
+    {
+      "name": "Endpoints",
+      "description": "Lists the APIs to get information about devices managed in Druva inSync."
+    },
+    {
+      "name": "Legal Hold",
+      "description": "Lists the APIs to get information about the legal hold policies and manage users on legal hold."
+    },
+    {
+      "name": "Event Management",
+      "description": "Lists the APIs to get information about the events generated in Druva inSync."
+    },
+    {
+      "name": "Storage Management",
+      "description": "Lists the APIs to get information about the storages and inSync CloudCache Servers configured in Druva inSync."
     }
   ],
-  "info": {
-    "title": "example results",
-    "version": "1.0"
-  },
   "paths": {
-    "/results": {
+    "/usermanagement/v1/users": {
       "get": {
-        "description": "",
+        "tags": [
+          "User Management"
+        ],
+        "summary": "List all users",
+        "description": "Gets information about all the users in Druva inSync.",
+        "parameters": [
+          {
+            "name": "profileID",
+            "in": "query",
+            "description": "The profile ID of the profile associated with the user.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "storageID",
+            "in": "query",
+            "description": "The storage ID of the storage associated with the user.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "cacheID",
+            "in": "query",
+            "description": "The CloudCache server ID associated with the user.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "emailID",
+            "in": "query",
+            "description": "The email address of the user.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "The token to access the next page of results. Keep this field blank in the first request.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAddedOn",
+            "in": "query",
+            "description": "Filter to list users that are added to Druva inSync after a particular date. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "maxAddedOn",
+            "in": "query",
+            "description": "Filter to list users that are added to Druva inSync before a particular date. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "The status of the user account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "preserved"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
-                "examples": {
-                  "response": {
-                    "value": {
-                      "user": {
-                        "email": "test@example.com",
-                        "name": "Test user name"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "202": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "examples": {
-                  "cat": {
-                    "summary": "An example of a cat",
-                    "value": {
-                      "name": "Fluffy",
-                      "petType": "Cat",
-                      "color": "White",
-                      "gender": "male",
-                      "breed": "Persian"
-                    }
-                  },
-                  "dog": {
-                    "summary": "An example of a dog with a cat's name",
-                    "value": {
-                      "name": "Puma",
-                      "petType": "Dog",
-                      "color": "Black",
-                      "gender": "Female",
-                      "breed": "Mixed"
-                    }
-                  }
+                "schema": {
+                  "$ref": "#/components/schemas/UserList"
                 }
               }
             }
           },
           "400": {
-            "description": "Validation failed",
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
             "content": {
-              "application/xml": {
-                "examples": {
-                  "response": {
-                    "value": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>"
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Create a new user",
+        "description": "Creates a new user in Druva inSync with the defined settings. By default, a user is assigned a storage quota of 50 GB.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "To create a user in Druva inSync.",
+                "required": [
+                  "userName",
+                  "profileID",
+                  "storageID",
+                  "emailID"
+                ],
+                "properties": {
+                  "userName": {
+                    "description": "Specify the username for the user in Druva inSync",
+                    "type": "string",
+                    "example": "Ernie Carter"
+                  },
+                  "profileID": {
+                    "description": "Specify the ID of the profile to be associated with the user account.",
+                    "type": "integer",
+                    "example": 2
+                  },
+                  "storageID": {
+                    "description": "Specify the ID of the storage on which the user data backed up by inSync should be stored.",
+                    "type": "integer",
+                    "example": 2
+                  },
+                  "emailID": {
+                    "description": "Specify the email address of the user.",
+                    "type": "string",
+                    "example": "ernie.carter@druva.com"
                   }
                 }
               }
             }
           }
         },
-        "summary": "Update Password"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "422": {
+            "description": "The request was well-formed but was unprocessable due to semantic errors."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usermanagement/v1/users/{userID}": {
+      "get": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Get user information using userID",
+        "description": "Gets information about a particular user in Druva inSync using the userID.",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "It is a unique positive integer identifier associated with a user.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Update user information using userID",
+        "description": "Updates information about a particular user in Druva inSync using the userID. Either one of the parameters are mandatory.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "description": "The unique id of the user in inSync.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "To update the user in Druva inSync.",
+                "properties": {
+                  "userName": {
+                    "description": "Specify the username for the user in Druva inSync",
+                    "type": "string",
+                    "example": "Ernie Carter"
+                  },
+                  "profileID": {
+                    "description": "Specify the ID of the profile to be associated with the user account.",
+                    "type": "integer",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "422": {
+            "description": "The request was well-formed but was unprocessable due to semantic errors."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Delete a user",
+        "description": "Permanently delete a user in Druva inSync. When you delete a user all the data of the user is deleted from Druva inSync. If the user that is being deleted has shared data with guest users, this data is also deleted. Once the user data is deleted, it cannot be recovered.",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "The unique id of the user in inSync.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "422": {
+            "description": "The request was well-formed but was unprocessable due to  semantic errors."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usermanagement/v1/users/{userID}/resetPassword": {
+      "post": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Reset password for a user",
+        "description": "Resets the password for the user identified using the userID.",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "The unique id of the user in inSync.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "422": {
+            "description": "The request was well-formed but was unprocessable due to semantic errors."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/endpoints/v1/devices": {
+      "get": {
+        "tags": [
+          "Endpoints"
+        ],
+        "summary": "List all endpoints",
+        "description": "Gets information about all the user devices protected by Druva inSync.",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "query",
+            "description": "The Unique id of the user to which the device belongs in inSync.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "clientVersion",
+            "in": "query",
+            "description": "The inSync Client version installed on the device.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "platformOS",
+            "in": "query",
+            "required": false,
+            "description": "The operating system of the device.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "win32",
+                "linux2",
+                "darwin",
+                "android",
+                "ios"
+              ]
+            }
+          },
+          {
+            "name": "deviceStatus",
+            "in": "query",
+            "required": false,
+            "description": "The status of the device.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "enabled",
+                "disabled"
+              ]
+            }
+          },
+          {
+            "name": "upgradeState",
+            "in": "query",
+            "required": false,
+            "description": "The upgrade state of the device.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "NOT UPGRADABLE",
+                "UPGRADABLE",
+                "UPTODATE",
+                "SCHEDULED",
+                "UNKNOWN"
+              ]
+            }
+          },
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "The token to access next page of results. Keep the value blank in the first request.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minLastConnected",
+            "in": "query",
+            "description": "Filter to list devices that are connected to Druva inSync after a particular date. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "maxLastConnected",
+            "in": "query",
+            "description": "Filter to list devices that are connected to Druva inSync before a particular date. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "minAddedOn",
+            "in": "query",
+            "description": "Filter to list devices that are added to Druva inSync after a particular date. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "maxAddedOn",
+            "in": "query",
+            "description": "Filter to list devices that are added to Druva inSync after a particular date. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "serialNumber",
+            "in": "query",
+            "description": "A unique, identifying number assigned to an individual piece of hardware by the manufacturer.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "uuid",
+            "in": "query",
+            "description": "A 128-bit number used to uniquely identify device in internet.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/endpoints/v1/devices/{deviceid}": {
+      "get": {
+        "tags": [
+          "Endpoints"
+        ],
+        "summary": "Get device information",
+        "description": "Get device information using deviceID.",
+        "parameters": [
+          {
+            "name": "deviceid",
+            "in": "path",
+            "description": "It is a unique postive integer id associated with device.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/endpoints/v1/backups": {
+      "get": {
+        "tags": [
+          "Endpoints"
+        ],
+        "summary": "List endpoint backups",
+        "description": "Currently only the details of last successful backup are listed. Details of the backups older than 30 days are not listed.",
+        "parameters": [
+          {
+            "name": "lastSuccessful",
+            "in": "query",
+            "required": true,
+            "description": "Provides details of the last successful backup for a device.",
+            "schema": {
+              "type": "boolean",
+              "enum": [
+                true
+              ]
+            }
+          },
+          {
+            "name": "deviceID",
+            "in": "query",
+            "description": "Unique id of the user device in Druva inSync.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "userID",
+            "in": "query",
+            "description": "The Unique id of the user to which the device belongs in inSync.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "The token to access next page of results. Keep the value blank in the first request.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minBackupStartTime",
+            "in": "query",
+            "description": "Filter to list the backups that started after a particular date and time. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "maxBackupStartTime",
+            "in": "query",
+            "description": "Filter to list the backups that started before a particular date and time. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "minBackupEndTime",
+            "in": "query",
+            "description": "Filter to list the backups that ended after a particular date and time. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "maxBackupEndTime",
+            "in": "query",
+            "description": "Filter to list the backups that ended before a particular date and time. Example format - YYYY-MM-DDTHH:MM:SSZ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storagemanagement/v1/storages": {
+      "get": {
+        "tags": [
+          "Storage Management"
+        ],
+        "summary": "List all storages",
+        "description": "Gets information about all storages configured for your account in Druva inSync.",
+        "parameters": [
+          {
+            "name": "nextPageToken",
+            "in": "query",
+            "description": "The token to access the next page of results. Keep this field blank in the first request.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storagemanagement/v1/storages/{storageID}": {
+      "get": {
+        "tags": [
+          "Storage Management"
+        ],
+        "summary": "Get storage information using storageID",
+        "description": "Gets information about a particular storage in Druva inSync.",
+        "parameters": [
+          {
+            "name": "storageID",
+            "in": "path",
+            "description": "It is a unique positive integer identifier associated with a storage.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Storage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storagemanagement/v1/cloudcaches": {
+      "get": {
+        "tags": [
+          "Storage Management"
+        ],
+        "summary": "List all CloudCache Servers",
+        "description": "Gets information about all the CloudCache Servers configured in Druva inSync.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloudCacheList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storagemanagement/v1/cloudcaches/{cloudCacheID}": {
+      "get": {
+        "tags": [
+          "Storage Management"
+        ],
+        "summary": "Get storage information using CloudCache Server ID",
+        "description": "Gets information about a particular CloudCache Server configured in Druva inSync.",
+        "parameters": [
+          {
+            "name": "cloudCacheID",
+            "in": "path",
+            "description": "It is a unique positive integer identifier associated with CloudCache Server configured in Druva inSync.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloudCache"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/eventmanagement/v2/events": {
+      "get": {
+        "tags": [
+          "Event Management"
+        ],
+        "summary": "List all events",
+        "description": "Gets information about all the events generated in Druva inSync. You can also get Events API response in CEF and Syslog formats. For more information, see <a href=https://developer.druva.com/docs/event-apis>Events API to export inSync events.</a>",
+        "parameters": [
+          {
+            "name": "tracker",
+            "in": "query",
+            "required": true,
+            "description": "Tracker is valid for the next 48 hours, is an identifier that contains inSync database reference and identifies the next set of unique events when successive Events API call is made. Do not include Tracker parameter in the first request. ",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "The request did not include an authentication token or the authentication token was expired."
+          },
+          "404": {
+            "description": "The requested resource was not found."
+          },
+          "500": {
+            "description": "The request was not processed due to an internal error in inSync Cloud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Requested HTTP method is not implemented.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/legalholds/v3/policies": {
+      "get": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "List all the legal hold policies",
+        "description": "Lists all the legal hold policies that are configured in your inSync Cloud environment.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListLegalholds"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "Create a legal hold policy",
+        "description": "Create a legal hold policy in your inSync Cloud environment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCreateLHPolicy"
+              }
+            }
+          },
+          "description": "Request body to create legal hold policy."
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateLHPolicy"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_422"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/legalholds/v3/policies/{policyId}": {
+      "get": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "Get details of a legal hold policy",
+        "description": "Gets details of a legal hold policy in your inSync Cloud environment.",
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "description": "The policyId for which the details are required.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLegalholds"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "Delete a legal hold policy",
+        "description": "Deletes the legal hold policy from your inSync Cloud environment.",
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "description": "The ID of the legal hold policy which is to be deleted.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteLegalholds"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/legalholds/v3/policies/{policyId}/users": {
+      "post": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "Add or delete users (custodians) from the legal hold policy",
+        "description": "Add or delete users from the legal hold policy in your inSync Cloud environment.",
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "description": "Custodians to be added OR deleted from the legal hold policy with policyId.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOperateOnCustodians"
+              }
+            }
+          },
+          "description": "Request body to add OR delete users from the legal hold policy."
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseOperateOncustodians"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "List the users on legal hold",
+        "description": "Retrieves the list of users who are on legal hold in your inSync Cloud environment.",
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "path",
+            "description": "The policyId for which the details are required.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseGetCustodians"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/legalholds/v3/users/policies": {
+      "post": {
+        "tags": [
+          "Legal Hold"
+        ],
+        "summary": "List legal hold policies associated with a user",
+        "description": "Lists all the legal hold policies that are associated with a user.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestListPoliciesByUsers"
+              }
+            }
+          },
+          "description": "Request body to add OR delete users from the legal hold policy."
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseListPoliciesByUsers"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP_500"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
+  "servers": [
+    {
+      "url": "https://apis.druva.com/insync"
+    }
+  ],
   "components": {
-    "schemas": {
-      
-    },
-    "responses": {
-      
-    },
-    "parameters": {
-      
-    },
-    "examples": {
-      
-    },
-    "requestBodies": {
-      
-    },
     "securitySchemes": {
-      
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://apis.druva.com/token",
+            "scopes": {
+              "read": "Grants read access"
+            }
+          }
+        }
+      }
     },
-    "headers": {
-      
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "userID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The unique id of the user in inSync.",
+            "example": 1
+          },
+          "userName": {
+            "type": "string",
+            "description": "The username of the user in inSync.",
+            "example": "Ernie Carter"
+          },
+          "emailID": {
+            "type": "string",
+            "description": "The email address of the user.",
+            "example": "ernie.carter@druva.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the user account.",
+            "enum": [
+              "active",
+              "preserved"
+            ]
+          },
+          "profileID": {
+            "type": "integer",
+            "description": "The profile ID of the profile associated with the user.",
+            "example": 1
+          },
+          "storageID": {
+            "type": "integer",
+            "description": "The storage ID of the storage associated with the user.",
+            "example": 1
+          },
+          "cacheID": {
+            "type": "integer",
+            "description": "The CloudCache Server ID associated with the user.",
+            "example": 1
+          },
+          "quota": {
+            "type": "string",
+            "description": "The storage quota assigned to the user in inSync.",
+            "example": "50 GB"
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date on which the user was added in inSync.",
+            "example": "2019-10-25T00:00:00.000Z"
+          }
+        }
+      },
+      "UserCreate": {
+        "type": "object",
+        "properties": {
+          "userID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The unique id of the user in Druva inSync.",
+            "example": 1
+          },
+          "userName": {
+            "type": "string",
+            "description": "The user name of the user in Druva inSync.",
+            "example": "Ernie Carter"
+          },
+          "emailID": {
+            "type": "string",
+            "description": "The email address of the user.",
+            "example": "ernie.carter@druva.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the user account.",
+            "enum": [
+              "active",
+              "preserved"
+            ]
+          },
+          "profileID": {
+            "type": "integer",
+            "description": "The profile ID of the profile associated with the user.",
+            "example": 1
+          },
+          "storageID": {
+            "type": "integer",
+            "description": "The storage ID of the storage associated with the user.",
+            "example": 1
+          },
+          "quota": {
+            "type": "string",
+            "description": "The storage quota assigned to the user in inSync.",
+            "example": "50 GB"
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date on which the user was added in inSync.",
+            "example": "2019-10-25T00:00:00.000Z"
+          }
+        }
+      },
+      "UserList": {
+        "type": "object",
+        "properties": {
+          "totalSize": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of users listed in the result pages.",
+            "example": 1
+          },
+          "nextPageToken": {
+            "type": "string",
+            "description": "The token to access next page of results. Keep the value blank in the first request.",
+            "example": "MTExMQ=="
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "deviceID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The unique id of the device in inSync.",
+            "example": 12345
+          },
+          "deviceName": {
+            "type": "string",
+            "description": "The device name in inSync.",
+            "example": "Ernie Carter's Macbook"
+          },
+          "serialNumber": {
+            "type": "string",
+            "description": "A unique, identifying number assigned to an individual piece of hardware by the manufacturer.",
+            "example": "PX045"
+          },
+          "deviceOS": {
+            "type": "string",
+            "description": "The operating system of the device.",
+            "example": "mojave"
+          },
+          "deviceOSVersion": {
+            "type": "string",
+            "description": "The version of the operating system of the device.",
+            "example": "10.14 r34567"
+          },
+          "platformOS": {
+            "type": "string",
+            "description": "The operating system platform of the device.",
+            "example": "darwin",
+            "enum": [
+              "win32",
+              "linux2",
+              "darwin",
+              "android",
+              "ios"
+            ]
+          },
+          "uuid": {
+            "type": "string",
+            "description": "A 128-bit number used to uniquely identify device in internet.",
+            "example": "TY5h67-5674r-675645"
+          },
+          "clientVersion": {
+            "type": "string",
+            "description": "The inSync Client version installed on the device.",
+            "example": "6.1.0 r56746"
+          },
+          "deviceStatus": {
+            "type": "string",
+            "description": "The status of the device.",
+            "enum": [
+              "enabled",
+              "disabled"
+            ]
+          },
+          "upgradeState": {
+            "type": "string",
+            "description": "The upgrade state of the device.",
+            "enum": [
+              "NOT UPGRADABLE",
+              "UPGRADABLE",
+              "UPTODATE",
+              "SCHEDULED",
+              "UNKNOWN"
+            ]
+          },
+          "userID": {
+            "type": "integer",
+            "description": "A unique positive integer identifier associated with a user in inSync.",
+            "example": 1
+          },
+          "totalBackupData": {
+            "type": "string",
+            "description": "The storage quota consumed by the user.",
+            "example": "40.05 GB"
+          },
+          "addedOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date on which the user was created in inSync.",
+            "example": "2019-10-25T00:00:00.000Z"
+          },
+          "lastUpgradedOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date on which the inSync Client was last updated for the user.",
+            "example": "2019-10-25T00:00:00.000Z"
+          },
+          "lastConnected": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date on which the inSync Client last connected with inSync Cloud.",
+            "example": "2019-10-25T00:00:00.000Z"
+          }
+        }
+      },
+      "DeviceList": {
+        "type": "object",
+        "properties": {
+          "totalSize": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of devices listed in the result pages.",
+            "example": 1
+          },
+          "nextPageToken": {
+            "type": "string",
+            "description": "The token to access next page of results. Keep the value blank in the first request.",
+            "example": "MTExMQ=="
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          }
+        }
+      },
+      "Backup": {
+        "type": "object",
+        "properties": {
+          "deviceID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "It is unique postive integer id associated with device.",
+            "example": 12345
+          },
+          "backupStatus": {
+            "type": "string",
+            "description": "Backup status of the device",
+            "enum": [
+              "Completed"
+            ]
+          },
+          "filesBackedUp": {
+            "type": "integer",
+            "description": "The number of files backed up in the last successful backup.",
+            "example": 124
+          },
+          "bytesTransferred": {
+            "type": "integer",
+            "description": "The number of bytes transferred in the last successful backup.",
+            "example": 23456
+          },
+          "filesMissed": {
+            "type": "integer",
+            "description": "The number of files missed on the device in the last successful backup.",
+            "example": 50
+          },
+          "snapshotSize": {
+            "type": "string",
+            "description": "The size of the snapshot generated in the last successful backup in MBs.",
+            "example": "2546 MB"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The start time of the last successful backup.",
+            "example": "2019-10-25T00:00:00.000Z"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The end time of the last successful backup.",
+            "example": "2019-10-25T00:00:00.000Z"
+          },
+          "systemSettingsBackedUp": {
+            "type": "boolean",
+            "description": "Specifies whether the system settings were backed up as part of the backup."
+          }
+        }
+      },
+      "BackupList": {
+        "type": "object",
+        "properties": {
+          "totalSize": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "nextPageToken": {
+            "type": "string",
+            "example": "MTExMQ=="
+          },
+          "backups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Backup"
+            }
+          }
+        }
+      },
+      "Storage": {
+        "type": "object",
+        "properties": {
+          "StorageID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The unique identifier of the storage in Druva inSync.",
+            "example": 1
+          },
+          "storageName": {
+            "type": "string",
+            "description": "The name of the storage in Druva inSync.",
+            "example": "Druva3_local"
+          },
+          "storageUsage": {
+            "type": "string",
+            "description": "The storage space consumed on the storage.",
+            "example": "225.04 MB"
+          },
+          "totalSizeOfBackedUpFiles": {
+            "type": "string",
+            "description": "The total size of the files backed up on this storage.",
+            "example": "1.29 GB"
+          }
+        }
+      },
+      "StorageList": {
+        "type": "object",
+        "properties": {
+          "totalSize": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of storage listed in the result pages.",
+            "example": 1
+          },
+          "nextPageToken": {
+            "type": "string",
+            "description": "The token to access next page of results. Keep the value blank in the first request.",
+            "example": "MTExMQ=="
+          },
+          "storages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Storage"
+            }
+          }
+        }
+      },
+      "CloudCache": {
+        "type": "object",
+        "properties": {
+          "cloudCacheID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The inSync assigned unique identifier of the CloudCache Server.",
+            "example": 1
+          },
+          "cloudCacheName": {
+            "type": "string",
+            "description": "The name of the CloudCache Server.",
+            "example": "Druva_cloudcache"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the CloudCache Server.",
+            "enum": [
+              "Not Active",
+              "Active",
+              "Decommissioned"
+            ],
+            "example": "Active"
+          },
+          "cacheUsage": {
+            "type": "string",
+            "description": "The total disk space that the cache data consumed until date.",
+            "example": "1.29 GB"
+          },
+          "totalCacheSize": {
+            "type": "string",
+            "description": "The total disk space available for cache data.",
+            "example": "1 TB"
+          }
+        }
+      },
+      "CloudCacheList": {
+        "type": "object",
+        "properties": {
+          "totalSize": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of CloudCache Servers listed on the result pages.",
+            "example": 1
+          },
+          "nextPageToken": {
+            "type": "string",
+            "description": "The token to access next page of results. Keep the value blank in the first request.",
+            "example": "MTExMQ=="
+          },
+          "cloudcaches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudCache"
+            }
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The unique id of the event in inSync.",
+            "example": 101
+          },
+          "initiator": {
+            "type": "string",
+            "description": "The initiator of the event. In case of a user generated event or an administrator generated event the corresponding email address is displayed. In case of System event, the initiator will always be the name of the system.",
+            "example": "ernie.carter@druva.com"
+          },
+          "inSyncDataSourceID": {
+            "type": "integer",
+            "description": "The inSync assigned identifier of the user device on which the event occurred.",
+            "example": 2
+          },
+          "inSyncDataSourceName": {
+            "type": "string",
+            "description": "The device name on which the event occurred.",
+            "example": "DDSPL1111"
+          },
+          "clientVersion": {
+            "type": "string",
+            "description": "The inSync Client version on the user device.",
+            "example": "6.1.1r73332"
+          },
+          "clientOS": {
+            "type": "string",
+            "description": "The OS on which the inSync Client is installed.",
+            "example": "win32"
+          },
+          "inSyncUserID": {
+            "type": "integer",
+            "description": "inSync assigned identifier of the user associated with the event.",
+            "example": 11
+          },
+          "inSyncUserName": {
+            "type": "string",
+            "description": "The name of the inSync user associated with the event.",
+            "example": "sagard"
+          },
+          "inSyncUserEmail": {
+            "type": "string",
+            "description": "The email of the inSync user associated with the event.",
+            "example": "ernie.carter@druva.org"
+          },
+          "profileID": {
+            "type": "integer",
+            "description": "inSync assigned identifier of the inSync profile to which the user, associated with the occurred event is linked to.",
+            "example": 3
+          },
+          "profileName": {
+            "type": "string",
+            "description": "The name of the inSync profile to which the user, associated with the occurred event is linked to.",
+            "example": "document_desktop_profile"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of Event, <a href=https://developer.druva.com/docs/event-apis> List of Supported events</a>",
+            "example": "API Login"
+          },
+          "eventState": {
+            "type": "string",
+            "description": "State of Event",
+            "example": "Success"
+          },
+          "eventDetails": {
+            "type": "string",
+            "description": "Details about event specific to event. Also has eventgroupID which is userful for correlation of multiple events of single activity. if it is a backup event, details such as number of files backed up, number of files missed, time for backup, and so on.",
+            "example": "Total Backup Size:0, Files Backed up:0, Files Missed:0, System and App Settings:Yes, Total Bytes Transferred:0, eventsGroupId:2"
+          },
+          "timeStamp": {
+            "type": "string",
+            "description": "The date and time when the event was generated in the format - YYYY-MM-DDTHH:MM:SSZ",
+            "example": "2019-05-28T07:07:23.000Z"
+          },
+          "severity": {
+            "type": "string",
+            "description": "The severity level of the event as defined in Druva inSync.",
+            "example": 6
+          },
+          "ip": {
+            "type": "string",
+            "description": "The IP address of the device on which the event occurred. In case of an admin event, IP address of the device on which the administrator logged on to perform inSync activity is displayed.",
+            "example": "114.143.238.10"
+          },
+          "facility": {
+            "type": "string",
+            "description": "The facility number as defined in inSync Management Console Events API settings. Default value is 23.",
+            "example": 23
+          }
+        }
+      },
+      "EventList": {
+        "type": "object",
+        "properties": {
+          "tracker": {
+            "type": "string",
+            "description": "Tracker is valid for the next 48 hours, is an identifier that contains inSync database reference and identifies the next set of unique events when successive Events API call is made. Do not include Tracker parameter in the first request. ",
+            "example": "MTExMQ=="
+          },
+          "nextPageExists": {
+            "type": "boolean",
+            "description": "The flag to know if next page of result exists.",
+            "example": true
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "InsyncEndpoints-1006",
+            "description": "Application specific error code"
+          },
+          "message": {
+            "type": "string",
+            "example": "Internal server error",
+            "description": "Application specific error message"
+          },
+          "retryable": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, retry using exponential backoff"
+          },
+          "data": {
+            "type": "object",
+            "description": "Dictionary of values present in the error message for localization. Currently, no values are available."
+          }
+        }
+      },
+      "ListLegalholds": {
+        "type": "object",
+        "properties": {
+          "legalholdList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The data access type of the legal hold policy",
+                  "enum": [
+                    "All Backup Data",
+                    "Last Backup Data",
+                    "Data within a Date Range"
+                  ],
+                  "example": "Data within a Date Range"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the legal hold policy",
+                  "example": "LH Policy 1"
+                },
+                "policyId": {
+                  "type": "integer",
+                  "description": "The ID of the legal hold policy",
+                  "example": "1"
+                },
+                "cullingType": {
+                  "type": "string",
+                  "description": "The filter type of the legal hold policy. Applicable only if the data access type is 'Data within a Date Range'.",
+                  "enum": [
+                    "Include All Files",
+                    "Include Only Deleted Files"
+                  ],
+                  "example": "Include Only Deleted Files"
+                },
+                "startDate": {
+                  "type": "string",
+                  "description": "The start date in the range in which the data is to be accessed. Applicable only if the data access type is 'Data within a Date Range'.",
+                  "format": "date",
+                  "example": "2019-03-19"
+                },
+                "endDate": {
+                  "type": "string",
+                  "description": "The end date in the range in which the data is to be accessed. Applicable only if the data access type is 'Data within a Date Range'.",
+                  "format": "date",
+                  "example": "2019-10-25"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetLegalholds": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The data access type of the legal hold policy",
+            "enum": [
+              "All Backup Data",
+              "Last Backup Data",
+              "Data within a Date Range"
+            ],
+            "example": "Data within a Date Range"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the legal hold policy",
+            "example": "LH Policy 1"
+          },
+          "policyId": {
+            "type": "integer",
+            "description": "The ID of the Legal hold policy",
+            "example": "1"
+          },
+          "cullingType": {
+            "type": "string",
+            "description": "The filter type of the legal hold policy. Applicable only if the data access type is 'Data within a Date Range'.",
+            "enum": [
+              "Include All Files",
+              "Include Only Deleted Files"
+            ],
+            "example": "Include Only Deleted Files"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date in the range in which the data is to be accessed. Applicable only if the data access type is 'Data within a Date Range'.",
+            "format": "date",
+            "example": "2019-03-19"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date in the range in which the data is to be accessed. Applicable only if the data access type is 'Data within a Date Range'.",
+            "format": "date",
+            "example": "2019-10-25"
+          }
+        }
+      },
+      "RequestCreateLHPolicy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the legal hold policy.",
+            "example": "LH Policy 1"
+          },
+          "type": {
+            "type": "string",
+            "description": "The data access type of the legal hold policy",
+            "enum": [
+              "All Backup Data",
+              "Last Backup Data",
+              "Data within a Date Range"
+            ],
+            "example": "Data within a Date Range"
+          },
+          "cullingType": {
+            "type": "string",
+            "description": "The filter type of the legal hold policy. Applicable only if the data access type is 'Data within a Date Range'. Use any of the filter types",
+            "enum": [
+              "Include All Files",
+              "Include Only Deleted Files"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date in the range in which the data is to be accessed. Applicable only if the data access type is 'Data within a Date Range'.",
+            "format": "date",
+            "example": "2019-03-19"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date in the range in which the data is to be accessed. Applicable only if the data access type is 'Data within a Date Range'.",
+            "format": "date",
+            "example": "2019-10-25"
+          }
+        }
+      },
+      "ResponseCreateLHPolicy": {
+        "type": "object",
+        "properties": {
+          "policyId": {
+            "type": "integer",
+            "description": "The ID of the legal hold policy.",
+            "example": "1"
+          }
+        }
+      },
+      "DeleteLegalholds": {
+        "type": "object",
+        "properties": {
+          
+        }
+      },
+      "RequestOperateOnCustodians": {
+        "type": "object",
+        "properties": {
+          "custodians": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user that should be added to OR deleted from the legal hold policy.",
+                  "example": "john.doe@someorg.com"
+                }
+              }
+            }
+          },
+          "action": {
+            "type": "string",
+            "description": "The action to be performed on the user.",
+            "enum": [
+              "add",
+              "delete"
+            ],
+            "example": "add"
+          }
+        }
+      },
+      "ResponseOperateOncustodians": {
+        "type": "object",
+        "properties": {
+          "alreadyOnLegalhold": {
+            "type": "array",
+            "description": "While adding a user to a legal hold policy, if the user is already on legal hold then the email address is returned in this list. This field is returned only if the action is 'add'.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user to be added to legal hold policy but user is already on legal hold.",
+                  "example": "john.doe@someorg.com"
+                }
+              }
+            }
+          },
+          "notOnLegalhold": {
+            "type": "array",
+            "description": "While deleting a user from a legal hold policy, if user is already deleted from legal hold then the user email address will be returned in this list. This field is returned only if the action is 'delete'.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user to be deleted from legal hold policy but user is already deleted from legal hold.",
+                  "example": "john.doe_1@someorg.com"
+                }
+              }
+            }
+          },
+          "notInsyncUsers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "While adding OR deleting a user from a legal hold policy, if the user is not a valid inSync user then the user email address will be returned in this list.",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user to be added OR deleted from the legal hold policy but user is not a valid inSync user.",
+                  "example": "john.doe_2@someorg.com"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ResponseGetCustodians": {
+        "type": "object",
+        "properties": {
+          "custodians": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user that belongs to the legal hold policy.",
+                  "example": "john.doe@someorg.com"
+                },
+                "webdavUrl": {
+                  "type": "string",
+                  "description": "Data access url to access users data.",
+                  "example": "https://restore-c1-kunals.drtst.in/webdav/LH Policy 1/uname/"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RequestListPoliciesByUsers": {
+        "type": "object",
+        "properties": {
+          "custodians": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user for which legal hold policies are requested.",
+                  "example": "john.doe@someorg.com"
+                }
+              }
+            }
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "list"
+            ]
+          }
+        }
+      },
+      "ResponseListPoliciesByUsers": {
+        "type": "object",
+        "properties": {
+          "custodians": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emailId": {
+                  "type": "string",
+                  "description": "The email address of the user for which legal hold policies are requested.",
+                  "example": "john.doe@someorg.com"
+                },
+                "policyIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "example": "2, 4, 11"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "HTTP_400": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "enum": [
+              "inSyncLegalholds-4294967489"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "enum": [
+              "Invalid API Syntax"
+            ]
+          },
+          "data": {
+            "type": "object"
+          },
+          "retryable": {
+            "type": "boolean",
+            "enum": [
+              false,
+              true
+            ]
+          }
+        }
+      },
+      "HTTP_404": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "enum": [
+              "inSyncLegalholds-4294967438"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "enum": [
+              "Legalhold Policy Not found"
+            ]
+          },
+          "data": {
+            "type": "object"
+          },
+          "retryable": {
+            "type": "boolean",
+            "enum": [
+              false,
+              true
+            ]
+          }
+        }
+      },
+      "HTTP_422": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "enum": [
+              "inSyncLegalholds-4294967423"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "retryable": {
+            "type": "boolean",
+            "enum": [
+              false,
+              true
+            ]
+          }
+        }
+      },
+      "HTTP_500": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "enum": [
+              "inSyncLegalholds-2003"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "retryable": {
+            "type": "boolean",
+            "enum": [
+              false,
+              true
+            ]
+          }
+        }
+      }
     }
   },
-  "x-explorer-enabled": true,
+  "x-proxy-enabled": true,
   "x-samples-enabled": true,
   "x-samples-languages": [
     "curl",
@@ -108,6 +2607,5 @@
     "ruby",
     "javascript",
     "python"
-  ],
-  "x-proxy-enabled": true
+  ]
 }
